@@ -280,6 +280,7 @@
         <button class="btn" id="hostUnlock">Unlock</button>
       </div>
       <div id="hostPanel" hidden>
+        <button class="btn" id="backToRoom" style="margin-bottom:12px" hidden>↩️ Back to the room</button>
         <div class="field">
           <label for="hostName">Your name (host)</label>
           <input type="text" id="hostName" placeholder="e.g. Kuya Jun" maxlength="24" autocomplete="off">
@@ -321,7 +322,7 @@
     <div id="viewLobby" hidden>
       <div class="room-head">
         <span class="room-code">Room: <span id="lobbyCode">—</span></span>
-        <button class="leave-btn" id="leaveLobby">Leave</button>
+        <span><button class="leave-btn" id="toPanelLobby" hidden>⚙️ Host panel</button> <button class="leave-btn" id="leaveLobby">Leave</button></span>
       </div>
       <button class="btn ghost" id="copyCode" style="margin-top:0">📋 Copy registration link</button>
       <div class="count" id="playerCount">0 players</div>
@@ -335,6 +336,7 @@
     <div id="viewGame" hidden>
       <div class="room-head">
         <span class="room-code">Room: <span id="gameCode">—</span></span>
+        <button class="leave-btn" id="toPanelGame" hidden>⚙️ Host panel</button>
       </div>
       <div class="final" id="waitingArea" hidden>
         <h2>⏳ WAITING AREA</h2>
@@ -517,7 +519,8 @@ const nameOf = (id, data) => ((data.players || {})[id] || {}).name || 'Player';
 
 /* ---------- views ---------- */
 const views = { reg: $('viewReg'), host: $('viewHost'), wait: $('viewWait'), lobby: $('viewLobby'), game: $('viewGame') };
-function showView(n) { Object.entries(views).forEach(([k, v]) => { v.hidden = k !== n; }); }
+var hostPanelOpen = false;
+function showView(n) { if (HOST_MODE && hostPanelOpen && (n === 'lobby' || n === 'game')) n = 'host'; Object.entries(views).forEach(([k, v]) => { v.hidden = k !== n; }); }
 const homeView = PLAYER_TOKEN ? 'wait' : HOST_MODE ? 'host' : 'reg';
 const baseUrl = () => location.href.split('?')[0].split('#')[0];
 $('headDesc').textContent = PLAYER_TOKEN
@@ -748,6 +751,11 @@ async function hostEnterLive(code) {
   } catch (e) { console.error(e); return false; }
   finally { hostEntering = false; }
 }
+function openHostPanel() { hostPanelOpen = true; showView('host'); $('backToRoom').hidden = !curCode; window.scrollTo(0, 0); }
+function backToRoomView() { hostPanelOpen = false; $('backToRoom').hidden = true; if (lastData) showView(lastData.started ? 'game' : 'lobby'); }
+if (HOST_MODE) { $('toPanelLobby').hidden = false; $('toPanelGame').hidden = false; }
+$('toPanelLobby').onclick = openHostPanel; $('toPanelGame').onclick = openHostPanel;
+$('backToRoom').onclick = backToRoomView;
 $('enterLiveBtn').onclick = () => { hostAutoSkip = false; if (hostLiveCode) hostEnterLive(hostLiveCode); };
 let codeMap = {};
 async function refreshRegList() {
@@ -978,7 +986,7 @@ function handleRoom(code, data, rev) {
   if (!data || !(data.players || {})[myId]) {
     const s = getSession(); setSession(null, s.name);
     stopWatching(); curCode = null; showView(homeView);
-    if (HOST_MODE) { hostAutoSkip = true; $('enterLiveBtn').hidden = !hostLiveCode; }
+    if (HOST_MODE) { hostAutoSkip = true; hostPanelOpen = false; $('backToRoom').hidden = true; $('enterLiveBtn').hidden = !hostLiveCode; }
     if (PLAYER_TOKEN) setWait('Hi, ' + (regData ? regData.name : '') + '! 👋', '⏳ That game ended. Waiting for the host to open the next one…');
     else toast('That room was closed.');
     return;
@@ -1280,7 +1288,7 @@ async function leaveRoom() {
   stopWatching(); curCode = null; lastData = null;
   setSession(null, s.name);
   showView(homeView);
-  if (HOST_MODE) { hostAutoSkip = true; $('enterLiveBtn').hidden = !hostLiveCode; }
+  if (HOST_MODE) { hostAutoSkip = true; hostPanelOpen = false; $('backToRoom').hidden = true; $('enterLiveBtn').hidden = !hostLiveCode; }
   if (PLAYER_TOKEN) { manualLeft = true; setWait('You left the game', 'Want to come back?'); $('waitRejoin').hidden = false; }
   if (!code) return;
   try { await rpc('bingo_leave', { p_code: code, p_pid: myId }); } catch (e) { /* best effort */ }
