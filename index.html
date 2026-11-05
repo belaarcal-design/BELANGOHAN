@@ -80,6 +80,31 @@
   .chips { display:flex; flex-wrap:wrap; gap:6px; }
   .chip { padding:5px 11px; border-radius:20px; background:#fff; border:2px solid var(--hair); font-size:12.5px; font-weight:700; }
   .host-tag { margin-left:6px; font-size:9px; font-weight:800; letter-spacing:1px; background:var(--gold-deep); color:#fff; padding:2px 5px; border-radius:6px; }
+  #winOverlay { position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(40,25,0,.82); animation:winFade .35s ease-out; }
+  #fwCanvas { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  .win-card { position:relative; text-align:center; max-width:340px; width:100%; padding:26px 20px 22px; border-radius:26px; border:4px solid #fff; background:linear-gradient(180deg,#fff6c9,#ffe28a); box-shadow:0 0 0 3px var(--gold-deep), 0 24px 60px -10px rgba(0,0,0,.6); animation:winPop .55s cubic-bezier(.2,1.4,.4,1); }
+  .win-emoji { font-size:56px; line-height:1; margin-bottom:6px; }
+  .win-card h2 { margin:0; font-family:'Bebas Neue',sans-serif; font-size:58px; letter-spacing:3px; line-height:1; color:var(--gold-dark); text-shadow:0 3px 0 #fff; }
+  .win-name { margin:8px 0 2px; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:22px; color:var(--ink); word-break:break-word; }
+  .win-sub { margin:0 0 14px; font-size:12.5px; font-weight:600; color:var(--muted); line-height:1.5; }
+  .win-letters { display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-end; gap:0 3px; margin:2px 0 6px; min-height:56px; }
+  .win-letters span { display:inline-block; font-family:'Bebas Neue',sans-serif; line-height:1; color:var(--ink); text-shadow:0 3px 0 #fff; opacity:0; transform:scale(.1) translateY(30px); animation:letterPop .5s cubic-bezier(.2,1.6,.4,1) forwards; }
+  .win-letters span.sp { width:.35em; }
+  #winTitle { opacity:0; transform:scale(.6); transition:opacity .4s, transform .4s cubic-bezier(.2,1.6,.4,1); }
+  #winTitle.show { opacity:1; transform:scale(1); }
+  @keyframes letterPop { 0% { opacity:0; transform:scale(.1) translateY(30px); } 60% { opacity:1; transform:scale(1.35) translateY(-6px); } 100% { opacity:1; transform:scale(1) translateY(0); } }
+  @media (prefers-reduced-motion: reduce) { .win-letters span { animation:none; opacity:1; transform:none; } #winTitle { opacity:1; transform:none; transition:none; } }
+  @keyframes winFade { from { opacity:0; } to { opacity:1; } }
+  @keyframes winPop { from { transform:scale(.5); opacity:0; } to { transform:scale(1); opacity:1; } }
+  .live-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px; }
+  .live-cell { text-align:center; padding:12px 6px; border-radius:16px; background:#fff; border:2px solid var(--hair); }
+  .live-cell b { display:block; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:32px; line-height:1; color:var(--gold-dark); }
+  .live-cell span { font-size:11px; letter-spacing:1px; font-weight:700; color:var(--muted); text-transform:uppercase; }
+  .lb-row { display:flex; align-items:center; gap:10px; padding:9px 12px; margin-bottom:6px; border-radius:14px; background:#fff; border:2px solid var(--hair); font-weight:700; font-size:14px; }
+  .lb-row .rk { width:28px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:18px; }
+  .lb-row .nm { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lb-row .ws { font-family:'Baloo 2',sans-serif; font-weight:800; color:var(--gold-dark); }
+  .lb-row.top { background:linear-gradient(135deg,#fff3b8,var(--gold)); border-color:#fff; box-shadow:0 0 0 2px var(--gold-deep); }
   .count { font-size:12px; font-weight:700; color:var(--muted); margin:10px 0 8px; }
   .open-rooms { display:flex; flex-direction:column; gap:8px; }
   .open-room { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-radius:12px; border:2px solid var(--hair); background:#fff; cursor:pointer; font-size:13px; font-weight:700; color:var(--ink); font-family:inherit; width:100%; }
@@ -349,6 +374,27 @@
     </div>
 
   </div>
+
+  <div class="panel" id="liveBox" style="margin-top:14px">
+    <div class="sec-title" style="margin-top:0">📊 LIVE — SUMALI NA</div>
+    <div class="live-grid">
+      <div class="live-cell"><b id="liveP">0</b><span>players</span></div>
+      <div class="live-cell"><b id="liveC">0</b><span>cards</span></div>
+    </div>
+    <div id="liveMoney" hidden class="note" style="text-align:center;font-weight:800"></div>
+    <div class="sec-title">🏆 LEADERBOARD</div>
+    <div id="lbList"><p class="note" style="margin:0">Wala pang nananalo. Ikaw na ba ang una?</p></div>
+  </div>
+</div>
+<div id="winOverlay" hidden>
+  <canvas id="fwCanvas"></canvas>
+  <div class="win-card">
+    <div class="win-emoji" id="winEmoji">🎉</div>
+    <div class="win-letters" id="winLetters"></div>
+    <h2 id="winTitle">BINGO!</h2>
+    <p class="win-sub" id="winSub"></p>
+    <button class="btn" id="winClose" type="button" style="margin-top:0">Okay</button>
+  </div>
 </div>
 <div id="imgModal" hidden><img id="imgModalImg" alt="receipt"><button type="button" id="imgModalClose">Close</button></div>
 <div id="toast"></div>
@@ -387,10 +433,12 @@ async function rpc(fn, args) {
   if (error) throw error;
   return data;
 }
+function isGone(e) { return /P0002|23503|no_data_found|foreign key/i.test(String((e && e.code) || '') + ' ' + String((e && e.message) || '')); }
 function errMsg(e) {
   const m = String((e && (e.message || e.code)) || '');
   if (/could not find the function|schema cache|does not exist/i.test(m)) return '⚠️ Hindi pa na-run ang SQL setup (bingo-supabase.sql) sa Supabase.';
   if (/bad pin/i.test(m)) return '❌ Wrong PIN.';
+  if (isGone(e)) return '⚠️ Wala na sa system ang registration mo. Mag-register ulit.';
   return 'Connection problem. Please try again.';
 }
 
@@ -517,8 +565,8 @@ async function renderRegState() {
   $('regUploadWrap').hidden = (st === 'pending');
 }
 if (!PLAYER_TOKEN && !HOST_MODE) {
-  loadSettings().then(() => {
-    try { const saved = JSON.parse(localStorage.getItem(REG_KEY) || 'null'); if (saved && saved.id) enterRegFlow(saved.name, saved.id, saved.cards); } catch (e) {}
+  loadSettings().then(async () => {
+    try { const saved = JSON.parse(localStorage.getItem(REG_KEY) || 'null'); if (saved && saved.id) { let ok = true; try { ok = !!(await rpc('bingo_get_reg', { p_id: saved.id })); } catch (e) { ok = !isGone(e) && !/uuid|22P02/i.test(String(e.code || e.message)); } if (ok) enterRegFlow(saved.name, saved.id, saved.cards); else localStorage.removeItem(REG_KEY); } } catch (e) {}
   });
 }
 $('regBtn').onclick = async () => {
@@ -539,7 +587,7 @@ $('regUploadBtn').onclick = async () => {
   if (!file) return toast('Pumili muna ng larawan.');
   const btn = $('regUploadBtn'); btn.disabled = true;
   try { await uploadReceipt(regIdCur, file); toast('✅ Naipasa na ang receipt!'); $('regUploadFile').value = ''; renderRegState(); }
-  catch (e) { toast('❌ ' + errMsg(e)); }
+  catch (e) { toast('❌ ' + errMsg(e)); if (isGone(e)) registerAnother(); }
   finally { btn.disabled = false; }
 };
 $('regCopy').onclick = async () => {
@@ -1020,6 +1068,84 @@ function renderCards(cards, drawnSet, drawn) {
     '<div class="card">' + cardMarkup(card, drawnSet, latest) + '</div>').join('');
 }
 
+/* ---------- BINGO winner overlay + fireworks ---------- */
+let fwRaf = null, fwTimer = null, winHideTimer = null, fwBurst = null, winTimers = [];
+const winSeen = new Set();
+function stopFireworks() {
+  if (fwRaf) cancelAnimationFrame(fwRaf); fwRaf = null;
+  clearInterval(fwTimer); fwTimer = null; clearTimeout(winHideTimer); winHideTimer = null;
+}
+function closeWin() { $('winOverlay').hidden = true; stopFireworks(); winTimers.forEach(clearTimeout); winTimers = []; fwBurst = null; }
+function startFireworks() {
+  stopFireworks();
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = $('fwCanvas'), ctx = cv.getContext('2d');
+  cv.width = window.innerWidth; cv.height = window.innerHeight;
+  const COLORS = ['#ffd23f', '#ff6b6b', '#4ecdc4', '#ff9f1c', '#f7c6c9', '#ffffff', '#b980f0', '#7ccf74'];
+  let parts = [];
+  const burst = (x, y) => {
+    const col = COLORS[Math.floor(Math.random() * COLORS.length)], col2 = COLORS[Math.floor(Math.random() * COLORS.length)];
+    for (let i = 0; i < 70; i++) {
+      const a = Math.random() * Math.PI * 2, sp = 1.5 + Math.random() * 5;
+      parts.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 1, c: i % 3 ? col : col2, r: 1.5 + Math.random() * 2 });
+    }
+  };
+  const rb = () => burst(cv.width * (0.12 + Math.random() * 0.76), cv.height * (0.1 + Math.random() * 0.45));
+  fwBurst = burst;
+  rb(); setTimeout(rb, 150); setTimeout(rb, 320);
+  fwTimer = setInterval(rb, 420);
+  const loop = () => {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    parts = parts.filter((p) => p.life > 0);
+    for (const p of parts) {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.06; p.vx *= 0.99; p.life -= 0.012;
+      ctx.globalAlpha = Math.max(p.life, 0); ctx.fillStyle = p.c;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    fwRaf = requestAnimationFrame(loop);
+  };
+  loop();
+}
+function showWin(code, data) {
+  const key = code + ':' + (data.roundNumber || 1);
+  if (winSeen.has(key)) return;
+  winSeen.add(key);
+  try { if (sessionStorage.getItem('bng_win') === key) return; sessionStorage.setItem('bng_win', key); } catch (e) {}
+  const mine = data.winnerId === myId, nm = String(nameOf(data.winnerId, data));
+  $('winEmoji').textContent = mine ? '🏆' : '🎉';
+  $('winTitle').textContent = 'BINGO!'; $('winTitle').classList.remove('show');
+  $('winSub').textContent = (mine ? 'PANALO KA! Congrats! 🎊 ' : '') + 'Round ' + (data.roundNumber || 1) + ' — tapos na ang round. Hintayin ang host para sa susunod.';
+  winTimers.forEach(clearTimeout); winTimers = [];
+  const L = $('winLetters'); L.innerHTML = '';
+  const chars = Array.from(nm.toUpperCase()), STEP = 170;
+  const size = chars.length <= 8 ? 54 : chars.length <= 12 ? 44 : chars.length <= 18 ? 34 : 27;
+  const spans = chars.map((ch, i) => {
+    const s = document.createElement('span');
+    if (ch === ' ') s.className = 'sp'; else s.textContent = ch;
+    s.style.fontSize = size + 'px'; s.style.animationDelay = (0.25 + i * STEP / 1000) + 's';
+    L.appendChild(s); return s;
+  });
+  $('winOverlay').hidden = false;
+  startFireworks();
+  spans.forEach((s, i) => {
+    if (!s.textContent) return;
+    winTimers.push(setTimeout(() => {
+      if (!fwBurst || $('winOverlay').hidden) return;
+      const r = s.getBoundingClientRect(); fwBurst(r.left + r.width / 2, r.top + r.height / 2);
+    }, 250 + i * STEP));
+  });
+  const done = 250 + chars.length * STEP + 250;
+  winTimers.push(setTimeout(() => {
+    $('winTitle').classList.add('show');
+    if (fwBurst) { const r = $('winTitle').getBoundingClientRect(); fwBurst(r.left + r.width * 0.2, r.top); fwBurst(r.left + r.width * 0.8, r.top); fwBurst(r.left + r.width / 2, r.top - 20); }
+  }, done));
+  winHideTimer = setTimeout(closeWin, Math.max(15000, done + 9000));
+  try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch (e) {}
+}
+$('winClose').onclick = closeWin;
+window.addEventListener('resize', () => { const cv = $('fwCanvas'); cv.width = window.innerWidth; cv.height = window.innerHeight; });
+
 /* ---------- game ---------- */
 function renderGame(code, data) {
   showView('game');
@@ -1071,6 +1197,7 @@ function renderGame(code, data) {
   }
 
   $('claimBtn').hidden = !(active && myCards.length && !closed && anyWin(myCards, drawnSet));
+  if (closed && data.winnerId) showWin(code, data);
 
   const addBtn = $('addCardsGame');
   addBtn.hidden = !closed;
@@ -1138,6 +1265,30 @@ document.addEventListener('visibilitychange', () => {
 
 /* ---------- start ---------- */
 if (PLAYER_TOKEN) startPlayerMode();
+
+/* ---------- live totals + leaderboard ---------- */
+async function refreshLive() {
+  try {
+    const st = await rpc('bingo_stats');
+    if (st) {
+      $('liveP').textContent = st.players || 0; $('liveC').textContent = st.cards || 0;
+      const price = parseFloat(cardPrice) || 0, mo = $('liveMoney');
+      if (hostPin && price > 0) {
+        const f = (n) => '₱' + Number(n).toLocaleString('en-PH');
+        mo.textContent = '💰 ' + f((st.paid_cards || 0) * price) + ' confirmed · ' + f((st.cards || 0) * price) + ' expected (' + (st.paid_cards || 0) + '/' + (st.cards || 0) + ' cards, ' + f(price) + ' each)';
+        mo.hidden = false;
+      } else mo.hidden = true;
+    }
+  } catch (e) { /* stats not set up yet */ }
+  try {
+    const lb = await rpc('bingo_leaderboard');
+    if (Array.isArray(lb) && lb.length) {
+      const medal = ['🥇', '🥈', '🥉'];
+      $('lbList').innerHTML = lb.map((r, i) => '<div class="lb-row' + (i === 0 ? ' top' : '') + '"><span class="rk">' + (medal[i] || (i + 1)) + '</span><span class="nm">' + esc(r.name || 'Player') + '</span><span class="ws">' + r.wins + (r.wins === 1 ? ' win' : ' wins') + '</span></div>').join('');
+    }
+  } catch (e) { /* leaderboard not set up yet */ }
+}
+refreshLive(); setInterval(refreshLive, 5000);
 </script>
 </body>
 </html>
