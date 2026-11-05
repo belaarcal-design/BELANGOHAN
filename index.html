@@ -196,11 +196,11 @@
         <div class="steps"><span class="on">1 · REGISTER</span><span>2 · PAY</span><span>3 · GET LINK</span></div>
         <div class="field">
           <label for="regName">Your name</label>
-          <input type="text" id="regName" placeholder="hal. Maria Santos" maxlength="24" autocomplete="off">
+          <input type="text" id="regName" placeholder="e.g. Maria Santos" maxlength="24" autocomplete="off">
         </div>
         <div class="field">
           <label for="regContact">Facebook / IG / mobile no. (optional)</label>
-          <input type="text" id="regContact" placeholder="para ma-contact ka ng host" maxlength="60" autocomplete="off">
+          <input type="text" id="regContact" placeholder="so the host can reach you" maxlength="60" autocomplete="off">
         </div>
         <div class="stepper-row">
           <div class="lbl">🎟️ Cards<br>Each card is a separate 5×5 board</div>
@@ -224,11 +224,11 @@
           <div id="regStatus" class="note" style="font-weight:800;font-size:14px;margin:0"></div>
         </div>
         <div id="regUploadWrap" class="field" hidden>
-          <label for="regUploadFile">📸 Upload receipt (screenshot ng bayad)</label>
+          <label for="regUploadFile">📸 Upload receipt (screenshot of your payment)</label>
           <input type="file" id="regUploadFile" accept="image/*">
           <button class="btn" id="regUploadBtn" type="button" style="margin-top:10px">Send receipt</button>
         </div>
-        <p class="note" style="text-align:center">Kapag na-confirm ng host ang payment mo, lalabas dito ang unique link mo — kusang mag-a-update ang page na ito.</p>
+        <p class="note" style="text-align:center">Once the host confirms your payment, your unique link will appear here — this page updates automatically.</p>
         <button class="btn ghost" id="regAnotherPay" type="button">Register another player</button>
       </div>
       <div id="regDone" hidden>
@@ -240,18 +240,18 @@
         </div>
         <button class="btn" id="regOpen">▶️ Go to the game</button>
         <button class="btn ghost" id="regCopy">📋 Copy my link</button>
-        <p class="note">Isang beses lang magagamit ang link na ito: kapag kinumpirma mo na gagamitin mo na, mala-lock ito sa device mo. Huwag i-share. Pag pinindot mo ang "Go to the game", dadalhin ka sa room na available — at kung ongoing na ang laro, sa waiting area ka muna hanggang sa susunod na round.</p>
+        <p class="note">This link can only be used once: when you confirm you are using it, it locks to your device. Do not share it. When you press "Go to the game", you will be taken to the available room — and if a game is already in progress, you will wait in the waiting area until the next round.</p>
         <button class="btn ghost" id="regAnother">Register another player</button>
       </div>
       <div id="codeBox">
         <div class="divider">O</div>
         <div class="field">
-          <label for="codeInput">🔑 May code ka galing sa host?</label>
-          <input type="text" id="codeInput" placeholder="hal. K7M2QX" maxlength="12" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" style="text-transform:uppercase;letter-spacing:4px;text-align:center">
+          <label for="codeInput">🔑 Got a code from the host?</label>
+          <input type="text" id="codeInput" placeholder="e.g. K7M2QX" maxlength="12" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" style="text-transform:uppercase;letter-spacing:4px;text-align:center">
         </div>
         <p class="err" id="codeError"></p>
-        <button class="btn ghost" id="codeBtn" type="button" style="margin-top:0">Pumasok gamit ang code</button>
-        <p class="note" style="text-align:center">Kung hindi ka nabigyan ng unique link, magbibigay ang host ng code. Ilagay dito at dadalhin ka sa sarili mong link.</p>
+        <button class="btn ghost" id="codeBtn" type="button" style="margin-top:0">Enter with code</button>
+        <p class="note" style="text-align:center">If you were not given a unique link, the host can give you a code. Enter it here and you will be taken to your own link.</p>
       </div>
     </div>
 
@@ -259,8 +259,8 @@
     <div id="viewWait" hidden>
       <div class="final"><h2 id="waitTitle">Loading…</h2><p id="waitMsg"></p></div>
       <div id="waitConfirmWrap" hidden style="margin-top:14px">
-        <button class="btn" id="waitConfirmBtn" type="button">✅ Oo, gagamitin ko na ang link na ito</button>
-        <p class="note" style="text-align:center">Isang beses lang ito magagamit. Kapag kinumpirma mo, mala-lock ito sa device na ito.</p>
+        <button class="btn" id="waitConfirmBtn" type="button">✅ Yes, I am using this link now</button>
+        <p class="note" style="text-align:center">It can only be used once. When you confirm, it locks to this device.</p>
       </div>
       <div id="waitUploadWrap" hidden class="field" style="margin-top:14px">
         <label for="waitUploadFile">📸 Upload receipt</label>
@@ -282,26 +282,27 @@
       <div id="hostPanel" hidden>
         <div class="field">
           <label for="hostName">Your name (host)</label>
-          <input type="text" id="hostName" placeholder="hal. Kuya Jun" maxlength="24" autocomplete="off">
+          <input type="text" id="hostName" placeholder="e.g. Kuya Jun" maxlength="24" autocomplete="off">
         </div>
         <button class="btn" id="createBtn">➕ Open a new room &amp; set it live</button>
         <p class="note" id="liveStatus">No live room right now.</p>
+        <button class="btn" id="enterLiveBtn" style="margin-bottom:10px" hidden>🚪 Enter live room</button>
         <button class="btn ghost" id="closeLiveBtn" style="margin-top:0" hidden>⏹ Stop letting players in</button>
         <div class="sec-title" style="margin-top:6px">💳 PAYMENT DETAILS</div>
-        <div class="field" style="margin-bottom:8px"><label for="payPrice">Price per card (₱)</label><input type="number" id="payPrice" inputmode="decimal" min="0" step="1" placeholder="hal. 50"></div>
-        <div class="field" style="margin-bottom:8px"><label for="payNoteIn">Payment instructions</label><textarea class="ta" id="payNoteIn" maxlength="500" placeholder="hal. GCash 09XX XXX XXXX — Juan D.&#10;Ilagay ang pangalan mo sa message"></textarea></div>
+        <div class="field" style="margin-bottom:8px"><label for="payPrice">Price per card (₱)</label><input type="number" id="payPrice" inputmode="decimal" min="0" step="1" placeholder="e.g. 50"></div>
+        <div class="field" style="margin-bottom:8px"><label for="payNoteIn">Payment instructions</label><textarea class="ta" id="payNoteIn" maxlength="500" placeholder="e.g. GCash 09XX XXX XXXX — Juan D.&#10;Put your name in the message"></textarea></div>
         <div class="field" style="margin-bottom:8px"><label for="payQrFile">QR code (optional)</label><input type="file" id="payQrFile" accept="image/*"><p class="note" id="payQrState" style="margin:6px 0 0"></p></div>
         <div style="display:flex;gap:8px"><button class="btn ghost" id="paySave" style="margin-top:0">Save payment details</button><button class="btn ghost" id="payQrClear" style="margin-top:0">Remove QR</button></div>
         <div class="sec-title" style="margin-top:18px">📅 GAME DATE</div>
         <div class="field" style="margin-bottom:8px"><input type="datetime-local" id="evAt"></div>
-        <div class="field" style="margin-bottom:8px"><input type="text" id="evNote" placeholder="Note (optional) hal. Group Bingo Night" maxlength="80" autocomplete="off"></div>
+        <div class="field" style="margin-bottom:8px"><input type="text" id="evNote" placeholder="Note (optional) e.g. Group Bingo Night" maxlength="80" autocomplete="off"></div>
         <div style="display:flex;gap:8px"><button class="btn ghost" id="evSave" style="margin-top:0">Save date</button><button class="btn ghost" id="evClear" style="margin-top:0">Clear</button></div>
         <label class="toggle-row"><input type="checkbox" id="reqToggle"> Require an approved receipt before players can join</label>
         <div class="sec-title" id="recTitle">🧾 RECEIPTS (0 pending)</div>
         <div id="recList"></div>
         <div class="sec-title">🔑 GIVE A CODE</div>
-        <p class="note" style="margin-top:0">Para sa player na hindi nabigyan ng unique link: mag-generate dito ng code para sa bagong player, o pindutin ang 🔑 Code sa pangalan niya sa listahan sa ibaba.</p>
-        <div class="field" style="margin-bottom:8px"><input type="text" id="walkName" placeholder="Pangalan ng player" maxlength="24" autocomplete="off"></div>
+        <p class="note" style="margin-top:0">For a player who was not given a unique link: generate a code for a new player here, or press 🔑 Code next to their name in the list below.</p>
+        <div class="field" style="margin-bottom:8px"><input type="text" id="walkName" placeholder="Player name" maxlength="24" autocomplete="off"></div>
         <div class="field" style="margin-bottom:8px"><label for="walkCards">Cards</label><input type="number" id="walkCards" inputmode="numeric" min="1" max="10" value="1"></div>
         <button class="btn ghost" id="walkBtn" type="button" style="margin-top:0">🔑 Generate code</button>
         <div id="walkResult" class="final" hidden>
@@ -383,7 +384,7 @@
     </div>
     <div id="liveMoney" hidden class="note" style="text-align:center;font-weight:800"></div>
     <div class="sec-title">🏆 LEADERBOARD</div>
-    <div id="lbList"><p class="note" style="margin:0">Wala pang nananalo. Ikaw na ba ang una?</p></div>
+    <div id="lbList"><p class="note" style="margin:0">No winners yet. Will you be the first?</p></div>
   </div>
 </div>
 <div id="winOverlay" hidden>
@@ -401,7 +402,7 @@
 
 <script type="module">
 /* =====================================================================
-   SUPABASE SETTINGS — ilagay dito ang sa iyo
+   SUPABASE SETTINGS — put yours here
    (Supabase dashboard → Project Settings → API)
    ===================================================================== */
 const SUPABASE_URL = 'https://ntcdqdfhblmcgbypnkwk.supabase.co';
@@ -424,8 +425,8 @@ try {
   sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false }, realtime: { params: { eventsPerSecond: 10 } } });
 } catch (e) {
   fatal(e.message === 'config'
-    ? '⚙️ Ilagay muna ang SUPABASE_URL at SUPABASE_ANON_KEY sa taas ng script ng file na ito.'
-    : '⚠️ Hindi ma-load ang Supabase. I-check ang internet, at buksan ang file sa mismong browser o i-host sa web — hindi gagana ang rooms sa preview na naka-block ang external scripts.');
+    ? '⚙️ Set SUPABASE_URL and SUPABASE_ANON_KEY at the top of this file script first.'
+    : '⚠️ Could not load Supabase. Check your internet connection, and open the file in a real browser or host it on the web — rooms will not work in a preview that blocks external scripts.');
   throw e;
 }
 async function rpc(fn, args) {
@@ -436,9 +437,9 @@ async function rpc(fn, args) {
 function isGone(e) { return /P0002|23503|no_data_found|foreign key/i.test(String((e && e.code) || '') + ' ' + String((e && e.message) || '')); }
 function errMsg(e) {
   const m = String((e && (e.message || e.code)) || '');
-  if (/could not find the function|schema cache|does not exist/i.test(m)) return '⚠️ Hindi pa na-run ang SQL setup (bingo-supabase.sql) sa Supabase.';
+  if (/could not find the function|schema cache|does not exist/i.test(m)) return '⚠️ The SQL setup (bingo-supabase.sql) has not been run in Supabase yet.';
   if (/bad pin/i.test(m)) return '❌ Wrong PIN.';
-  if (isGone(e)) return '⚠️ Wala na sa system ang registration mo. Mag-register ulit.';
+  if (isGone(e)) return '⚠️ Your registration is no longer in the system. Please register again.';
   return 'Connection problem. Please try again.';
 }
 
@@ -475,11 +476,11 @@ function fileToDataUrl(file) {
       while (out.length > 700000 && q > 0.3) { q -= 0.1; out = c.toDataURL('image/jpeg', q); }
       resolve(out);
     };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Hindi mabasa ang larawan.')); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not read the image.')); };
     img.src = url;
   });
 }
-const STATUS_TXT = { pending: '⏳ Pending — hinihintay ang approval ng host', approved: '✅ Approved', rejected: '❌ Rejected — mag-upload ulit ng malinaw na screenshot' };
+const STATUS_TXT = { pending: '⏳ Pending — waiting for host approval', approved: '✅ Approved', rejected: '❌ Rejected — please upload a clear screenshot again' };
 async function getReceiptStatus(id) { try { return await rpc('bingo_receipt_status', { p_reg: id }); } catch (e) { return null; } }
 async function uploadReceipt(regId, file) { const img = await fileToDataUrl(file); await rpc('bingo_submit_receipt', { p_reg: regId, p_img: img }); }
 
@@ -523,7 +524,7 @@ $('headDesc').textContent = PLAYER_TOKEN
   ? 'Welcome! Everyone gets their own card — the host calls the numbers, and if 30 seconds pass with no call, the next number is called automatically. First to complete a line and tap BINGO wins the round.'
   : HOST_MODE
     ? 'Host panel — open a room, and every registered player who opens their link will be brought straight in.'
-    : 'Mag-register dito para sa Group Bingo! Pagkatapos, magbabayad ka at hihintayin ang confirmation ng host — saka mo makukuha ang sarili mong link para pumasok sa laro.';
+    : 'Register here for Group Bingo! Then you will pay and wait for the host to confirm — after that you will get your own link to join the game.';
 showView(homeView);
 
 /* ---------- registration ---------- */
@@ -559,9 +560,9 @@ async function renderRegState() {
   const aw = $('payAmountWrap');
   if (total > 0) { aw.hidden = false; aw.innerHTML = '₱' + total.toLocaleString('en-PH') + '<small>' + regCardsCur + (regCardsCur > 1 ? ' cards' : ' card') + ' × ₱' + esc(cardPrice) + '</small>'; }
   else aw.hidden = true;
-  $('regStatus').textContent = st === 'pending' ? '⏳ Hinihintay ang confirmation ng host sa payment mo…'
-    : st === 'rejected' ? '❌ Hindi natanggap ang receipt. Mag-upload ulit ng malinaw na screenshot.'
-    : '📸 I-upload ang screenshot ng bayad para ma-confirm.';
+  $('regStatus').textContent = st === 'pending' ? '⏳ Waiting for the host to confirm your payment…'
+    : st === 'rejected' ? '❌ Receipt not accepted. Please upload a clear screenshot again.'
+    : '📸 Upload a screenshot of your payment to get confirmed.';
   $('regUploadWrap').hidden = (st === 'pending');
 }
 if (!PLAYER_TOKEN && !HOST_MODE) {
@@ -584,9 +585,9 @@ $('regBtn').onclick = async () => {
 };
 $('regUploadBtn').onclick = async () => {
   const file = $('regUploadFile').files[0];
-  if (!file) return toast('Pumili muna ng larawan.');
+  if (!file) return toast('Please choose an image first.');
   const btn = $('regUploadBtn'); btn.disabled = true;
-  try { await uploadReceipt(regIdCur, file); toast('✅ Naipasa na ang receipt!'); $('regUploadFile').value = ''; renderRegState(); }
+  try { await uploadReceipt(regIdCur, file); toast('✅ Receipt sent!'); $('regUploadFile').value = ''; renderRegState(); }
   catch (e) { toast('❌ ' + errMsg(e)); if (isGone(e)) registerAnother(); }
   finally { btn.disabled = false; }
 };
@@ -613,11 +614,11 @@ $('codeInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('co
 $('codeBtn').onclick = async () => {
   $('codeError').style.display = 'none';
   const code = $('codeInput').value.trim();
-  if (!code) return showError('codeError', 'Ilagay ang code mula sa host.');
+  if (!code) return showError('codeError', 'Enter the code from the host.');
   const btn = $('codeBtn'); btn.disabled = true;
   try {
     const id = await rpc('bingo_redeem_code', { p_code: code });
-    if (!id) return showError('codeError', '❌ Mali o hindi valid ang code. I-check sa host.');
+    if (!id) return showError('codeError', '❌ Wrong or invalid code. Check with the host.');
     location.href = baseUrl() + '?p=' + id;
   } catch (e) { console.error(e); showError('codeError', errMsg(e)); }
   finally { btn.disabled = false; }
@@ -672,40 +673,40 @@ async function gateCheck() {
   try { ls = await rpc('bingo_link_status', { p_reg: PLAYER_TOKEN, p_device: DEVICE }); } catch (e) { ls = null; } // null = feature not set up -> don't block
   if (ls === 'used') {
     canPlay = false; $('waitUploadWrap').hidden = true; $('waitConfirmWrap').hidden = true;
-    return setWait('🔒 Used na ang link na ito', 'Nagamit na ito sa ibang device. Kung ikaw ito at nagpalit ka ng phone, kontakin ang host para ma-reset ang link mo.');
+    return setWait('🔒 This link has already been used', 'It was already used on another device. If this is you and you switched phones, contact the host to reset your link.');
   }
   if (requireReceipt) {
     const st = await getReceiptStatus(PLAYER_TOKEN);
     if (st !== 'approved' && !(await hasCode(PLAYER_TOKEN))) {
       canPlay = false; $('waitConfirmWrap').hidden = true;
-      if (st === 'pending') { setWait(hi, '⏳ Naipasa na ang receipt mo. Hinihintay ang approval ng host — kusang lilipat ang page na ito.'); $('waitUploadWrap').hidden = true; }
-      else if (st === 'rejected') { setWait(hi, '❌ Hindi natanggap ang receipt mo. Mag-upload ulit ng malinaw na screenshot.'); $('waitUploadWrap').hidden = false; }
-      else { setWait(hi, '📸 Wala ka pang naipasa na receipt. I-upload sa ibaba para ma-approve ng host.'); $('waitUploadWrap').hidden = false; }
+      if (st === 'pending') { setWait(hi, '⏳ Your receipt was sent. Waiting for host approval — this page will move on automatically.'); $('waitUploadWrap').hidden = true; }
+      else if (st === 'rejected') { setWait(hi, '❌ Your receipt was not accepted. Please upload a clear screenshot again.'); $('waitUploadWrap').hidden = false; }
+      else { setWait(hi, '📸 You have not sent a receipt yet. Upload one below so the host can approve it.'); $('waitUploadWrap').hidden = false; }
       return;
     }
   }
   $('waitUploadWrap').hidden = true;
   if (ls === 'unclaimed') {
     canPlay = false; $('waitConfirmWrap').hidden = false;
-    return setWait(hi, '✅ Handa ka na! Isang beses lang magagamit ang link na ito — pindutin ang button sa ibaba kapag gagamitin mo na.');
+    return setWait(hi, '✅ You are ready! This link can only be used once — press the button below when you are ready to use it.');
   }
   $('waitConfirmWrap').hidden = true;
-  if (!canPlay) { canPlay = true; setWait(hi, '⏳ Hinihintay ang host na mag-open ng game — kusang papasok ka kapag live na.'); handleLive(lastLiveCode); }
+  if (!canPlay) { canPlay = true; setWait(hi, '⏳ Waiting for the host to open the game — you will be taken in automatically once it is live.'); handleLive(lastLiveCode); }
 }
 $('waitConfirmBtn').onclick = async () => {
   const btn = $('waitConfirmBtn'); btn.disabled = true;
   try {
     const r = await rpc('bingo_claim_link', { p_reg: PLAYER_TOKEN, p_device: DEVICE });
-    if (r === 'used') toast('🔒 Nagamit na ang link na ito ng ibang device.');
+    if (r === 'used') toast('🔒 This link was already used by another device.');
     gateCheck();
   } catch (e) { toast('❌ ' + errMsg(e)); }
   finally { btn.disabled = false; }
 };
 $('waitUploadBtn').onclick = async () => {
   const file = $('waitUploadFile').files[0];
-  if (!file) return toast('Pumili muna ng larawan.');
+  if (!file) return toast('Please choose an image first.');
   const btn = $('waitUploadBtn'); btn.disabled = true;
-  try { await uploadReceipt(PLAYER_TOKEN, file); toast('✅ Naipasa na ang receipt!'); $('waitUploadFile').value = ''; gateCheck(); }
+  try { await uploadReceipt(PLAYER_TOKEN, file); toast('✅ Receipt sent!'); $('waitUploadFile').value = ''; gateCheck(); }
   catch (e) { toast('❌ ' + errMsg(e)); }
   finally { btn.disabled = false; }
 };
@@ -714,7 +715,7 @@ async function startPlayerMode() {
   try {
     let reg = null;
     try { reg = await rpc('bingo_get_reg', { p_id: PLAYER_TOKEN }); } catch (e) { if (!/uuid|22P02/i.test(String(e.code || e.message))) throw e; }
-    if (!reg) return setWait('❌ Invalid link', 'Hindi namin mahanap ang registration mo. Mag-register ulit, o kontakin ang host.');
+    if (!reg) return setWait('❌ Invalid link', 'We could not find your registration. Please register again, or contact the host.');
     regData = reg; setSession(null, regData.name);
     await loadSettings();
     watchLive((c) => handleLive(c));
@@ -724,7 +725,30 @@ async function startPlayerMode() {
 }
 
 /* ---------- HOST MODE (?host) — PIN is checked on the server ---------- */
-let hostPin = null, hostWatching = false;
+let hostPin = null, hostWatching = false, hostLiveCode = null, hostAutoSkip = false, hostEntering = false;
+async function fetchLiveCode() {
+  const { data, error } = await sb.from('bingo_live').select('code').eq('id', 1).maybeSingle();
+  if (error) throw error;
+  return data && data.code ? data.code : null;
+}
+// put the host straight into the live room (rejoin as a player if this device isn't in it yet)
+async function hostEnterLive(code) {
+  if (hostEntering || curCode) return false;
+  hostEntering = true;
+  try {
+    const { data } = await sb.from('bingo_rooms').select('data').eq('code', code).maybeSingle();
+    if (!data || !data.data || !data.data.roundNumber) return false;
+    const name = $('hostName').value.trim() || getSession().name || 'Host';
+    if (!(data.data.players || {})[myId]) {
+      const res = await rpc('bingo_join', { p_code: code, p_pid: myId, p_name: name, p_cards: 1 });
+      if (!res || !res.ok) return false;
+    }
+    setSession(code, name); enterRoom(code);
+    return true;
+  } catch (e) { console.error(e); return false; }
+  finally { hostEntering = false; }
+}
+$('enterLiveBtn').onclick = () => { hostAutoSkip = false; if (hostLiveCode) hostEnterLive(hostLiveCode); };
 let codeMap = {};
 async function refreshRegList() {
   try {
@@ -750,7 +774,7 @@ $('regList').addEventListener('click', async (e) => {
 });
 $('walkBtn').onclick = async () => {
   const name = $('walkName').value.trim();
-  if (!name) return toast('Ilagay muna ang pangalan ng player.');
+  if (!name) return toast('Enter the player name first.');
   const cards = Math.max(1, Math.min(MAX_CARDS, parseInt($('walkCards').value, 10) || 1));
   const btn = $('walkBtn'); btn.disabled = true;
   try {
@@ -766,11 +790,11 @@ $('walkBtn').onclick = async () => {
 $('walkCopy').onclick = () => copyText($('walkCopy').dataset.txt || $('walkCode').textContent, '📋 Code + link copied');
 $('regList').addEventListener('click', async (e) => {
   const b = e.target.closest('button[data-reset]'); if (!b) return;
-  if (!confirm('I-reset ang link ng player na ito? Magagamit niya ulit ito sa bagong device.')) return;
+  if (!confirm('Reset the link of this player? They will be able to use it again on a new device.')) return;
   try { await rpc('bingo_reset_link', { p_pin: hostPin, p_reg: b.dataset.reset }); toast('🔄 Link reset'); refreshRegList(); } catch (err) { toast(errMsg(err)); }
 });
 $('resetAllBtn').onclick = async () => {
-  if (!confirm('I-reset ang LAHAT ng links? Makakapag-confirm ulit ang bawat player.')) return;
+  if (!confirm('Reset ALL links? Every player will be able to confirm again.')) return;
   try { await rpc('bingo_reset_all_links', { p_pin: hostPin }); toast('🔄 All links reset'); refreshRegList(); } catch (err) { toast(errMsg(err)); }
 };
 $('hostUnlock').onclick = async () => {
@@ -788,8 +812,14 @@ $('hostUnlock').onclick = async () => {
     refreshReceipts(); setInterval(refreshReceipts, 5000);
     loadSettings().then(() => { $('reqToggle').checked = requireReceipt; $('evAt').value = eventAt; $('evNote').value = eventNote; $('payPrice').value = cardPrice === '0' ? '' : cardPrice; $('payNoteIn').value = payNote; refreshQrState(); });
     watchLive((code) => {
-      $('liveStatus').textContent = code ? '🟢 Live room: ' + code + ' — registered players are being brought in.' : 'No live room right now.';
+      if (code !== hostLiveCode) hostAutoSkip = false;
+      hostLiveCode = code || null;
+      $('liveStatus').textContent = code ? '🟢 Live room: ' + code + ' — only one room at a time. Stop it first to open a new one.' : 'No live room right now.';
       $('closeLiveBtn').hidden = !code;
+      $('enterLiveBtn').hidden = !code || !!curCode;
+      $('createBtn').disabled = !!code;
+      $('createBtn').textContent = code ? '🔒 A room is already live' : '➕ Open a new room & set it live';
+      if (code && !curCode && !hostAutoSkip) hostEnterLive(code);
     });
   }
   const s = getSession();
@@ -810,7 +840,7 @@ async function refreshReceipts() {
       '<span class="badge ' + esc(r.status) + '">' + esc(r.status) + '</span></div>' +
       '<div class="rec-time">' + esc(new Date(r.created_at).toLocaleString('en-PH', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })) + (r.contact ? ' · ' + esc(r.contact) : '') + '</div>' +
       '<div class="rec-btns"><button data-act="view">👁 View</button><button data-act="approved">✅ Approve</button><button data-act="rejected">❌ Reject</button></div></div>').join('')
-      : '<p class="note">Wala pang naipapasa na receipt.</p>';
+      : '<p class="note">No receipts submitted yet.</p>';
   } catch (e) { $('recList').innerHTML = '<p class="note">' + esc(errMsg(e)) + '</p>'; }
 }
 $('recList').addEventListener('click', async (e) => {
@@ -829,11 +859,11 @@ $('recList').addEventListener('click', async (e) => {
 $('imgModalClose').onclick = () => { $('imgModal').hidden = true; };
 $('imgModal').addEventListener('click', (e) => { if (e.target.id === 'imgModal') $('imgModal').hidden = true; });
 async function refreshQrState() {
-  try { const p = await rpc('bingo_get_pay'); $('payQrState').textContent = p && p.pay_qr ? '✅ May naka-save na QR' : 'Wala pang QR'; } catch (e) {}
+  try { const p = await rpc('bingo_get_pay'); $('payQrState').textContent = p && p.pay_qr ? '✅ QR saved' : 'No QR yet'; } catch (e) {}
 }
 async function savePayment(qr) {
   const price = ($('payPrice').value || '0').trim();
-  if (!/^\d{1,6}(\.\d{1,2})?$/.test(price)) return toast('Ilagay ang tamang presyo, hal. 50');
+  if (!/^\d{1,6}(\.\d{1,2})?$/.test(price)) return toast('Enter a valid price, e.g. 50');
   try {
     await rpc('bingo_set_payment', { p_pin: hostPin, p_price: price, p_note: $('payNoteIn').value.trim(), p_qr: qr });
     $('payQrFile').value = ''; await loadSettings(); refreshQrState(); toast('💳 Payment details saved');
@@ -847,7 +877,7 @@ $('paySave').onclick = async () => {
 $('payQrClear').onclick = () => savePayment('');
 $('evSave').onclick = async () => {
   const at = $('evAt').value;
-  if (!at) return toast('Pumili muna ng petsa at oras.');
+  if (!at) return toast('Choose a date and time first.');
   try { await rpc('bingo_set_event', { p_pin: hostPin, p_at: at, p_note: $('evNote').value.trim() }); await loadSettings(); toast('📅 Date saved'); }
   catch (err) { toast(errMsg(err)); }
 };
@@ -866,10 +896,19 @@ $('createBtn').onclick = async () => {
   if (!name) return showError('hostError', 'Please enter your name.');
   const btn = $('createBtn'); btn.disabled = true;
   try {
+    const live = await fetchLiveCode();
+    if (live) {
+      const { data: room } = await sb.from('bingo_rooms').select('data').eq('code', live).maybeSingle();
+      if (room && room.data && room.data.roundNumber) {
+        showError('hostError', '⚠️ There is already an ongoing room (' + live + '). Only one room at a time — tap "Stop letting players in" first if you want a new one.');
+        hostAutoSkip = false; hostEnterLive(live);
+        return;
+      }
+    }
     const code = await rpc('bingo_host_open', { p_pin: hostPin, p_pid: myId, p_name: name });
     setSession(code, name); enterRoom(code);
   } catch (e) { console.error(e); showError('hostError', errMsg(e)); }
-  finally { btn.disabled = false; }
+  finally { btn.disabled = !!hostLiveCode; }
 };
 $('closeLiveBtn').onclick = () => rpc('bingo_host_close_live', { p_pin: hostPin }).catch((e) => showError('hostError', errMsg(e)));
 
@@ -939,6 +978,7 @@ function handleRoom(code, data, rev) {
   if (!data || !(data.players || {})[myId]) {
     const s = getSession(); setSession(null, s.name);
     stopWatching(); curCode = null; showView(homeView);
+    if (HOST_MODE) { hostAutoSkip = true; $('enterLiveBtn').hidden = !hostLiveCode; }
     if (PLAYER_TOKEN) setWait('Hi, ' + (regData ? regData.name : '') + '! 👋', '⏳ That game ended. Waiting for the host to open the next one…');
     else toast('That room was closed.');
     return;
@@ -979,7 +1019,7 @@ $('startBtn').onclick = async () => {
   try { await rpc('bingo_start', { p_code: curCode, p_pid: myId }); fetchRoom(curCode); } catch (e) { toast('❌ Connection problem — try again.'); }
 };
 $('copyCode').onclick = async () => {
-  const text = 'Mag-register para sa Group Bingo! ' + baseUrl();
+  const text = 'Register for Group Bingo! ' + baseUrl();
   try { await navigator.clipboard.writeText(text); toast('📋 Copied!'); }
   catch (e) { prompt('Copy this:', text); }
 };
@@ -1115,7 +1155,7 @@ function showWin(code, data) {
   const mine = data.winnerId === myId, nm = String(nameOf(data.winnerId, data));
   $('winEmoji').textContent = mine ? '🏆' : '🎉';
   $('winTitle').textContent = 'BINGO!'; $('winTitle').classList.remove('show');
-  $('winSub').textContent = (mine ? 'PANALO KA! Congrats! 🎊 ' : '') + 'Round ' + (data.roundNumber || 1) + ' — tapos na ang round. Hintayin ang host para sa susunod.';
+  $('winSub').textContent = (mine ? 'YOU WON! Congrats! 🎊 ' : '') + 'Round ' + (data.roundNumber || 1) + ' — round over. Wait for the host to start the next one.';
   winTimers.forEach(clearTimeout); winTimers = [];
   const L = $('winLetters'); L.innerHTML = '';
   const chars = Array.from(nm.toUpperCase()), STEP = 170;
@@ -1176,12 +1216,12 @@ function renderGame(code, data) {
   if (!active) {
     const waiting = Object.values(players).filter((p) => p && !p.left && !isActive(p, data)).map((p) => p.name || 'Player');
     $('waitingAreaMsg').textContent = closed
-      ? 'Tapos na ang round. Hintayin ang host na magsimula ng susunod — kasama ka na doon.'
-      : 'Ongoing na ang Round ' + (data.roundNumber || 1) + ' (' + drawn.length + ' numbers na ang tinawag). Hindi ka na maisasama sa round na ito — kusang mag-a-activate ang card mo sa susunod na round. Pwede kang manood at makipag-chat dito.';
-    $('waitingAreaList').textContent = waiting.length ? 'Naghihintay: ' + waiting.join(', ') : '';
+      ? 'Round over. Wait for the host to start the next one — you will be included.'
+      : 'Round ' + (data.roundNumber || 1) + ' is in progress (' + drawn.length + ' numbers called so far). You cannot join this round — your card activates automatically next round. You can watch and chat here.';
+    $('waitingAreaList').textContent = waiting.length ? 'Waiting: ' + waiting.join(', ') : '';
   }
   const status = $('status');
-  if (!active) status.textContent = 'Nasa waiting area ka — papasok ka sa susunod na round.';
+  if (!active) status.textContent = 'You are in the waiting area — you will join the next round.';
   else if (closed && data.winnerId) status.textContent = '🎉 ' + nameOf(data.winnerId, data) + ' called BINGO!';
   else if (closed) status.textContent = 'All 75 numbers called — no BINGO this round.';
   else if (isHost) status.textContent = drawn.length ? drawn.length + ' numbers called so far.' : 'Tap "Call Next Number" to start.';
@@ -1240,7 +1280,8 @@ async function leaveRoom() {
   stopWatching(); curCode = null; lastData = null;
   setSession(null, s.name);
   showView(homeView);
-  if (PLAYER_TOKEN) { manualLeft = true; setWait('You left the game', 'Gusto mo bang bumalik?'); $('waitRejoin').hidden = false; }
+  if (HOST_MODE) { hostAutoSkip = true; $('enterLiveBtn').hidden = !hostLiveCode; }
+  if (PLAYER_TOKEN) { manualLeft = true; setWait('You left the game', 'Want to come back?'); $('waitRejoin').hidden = false; }
   if (!code) return;
   try { await rpc('bingo_leave', { p_code: code, p_pid: myId }); } catch (e) { /* best effort */ }
 }
