@@ -155,6 +155,24 @@
   .chat-row { display:flex; gap:8px; margin-top:8px; }
   .chat-row button { padding:0 16px; border:3px solid #fff; border-radius:14px; background:linear-gradient(180deg,#ffe07a,var(--gold-deep)); color:#4a3000; font-weight:800; cursor:pointer; }
   .typing { font-size:11.5px; color:var(--muted); min-height:16px; margin-top:4px; }
+  /* voice chat */
+  .voice-panel { border-radius:16px; padding:12px; margin:14px 0 4px; background:linear-gradient(180deg,#fff,#fff6d9); border:2px solid var(--hair); }
+  .voice-head { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .voice-title { font-family:'Baloo 2',sans-serif; font-weight:800; font-size:13px; letter-spacing:.5px; color:var(--gold-dark); display:flex; align-items:center; gap:6px; }
+  .v-dot { width:8px; height:8px; border-radius:50%; background:#2fbf5b; display:none; }
+  .v-dot.on { display:inline-block; animation:vLive 1.6s ease-out infinite; }
+  @keyframes vLive { 0% { box-shadow:0 0 0 0 rgba(47,191,91,.55); } 100% { box-shadow:0 0 0 8px rgba(47,191,91,0); } }
+  .voice-btns { display:flex; gap:6px; flex-wrap:wrap; }
+  .v-btn { font-family:'Baloo 2',sans-serif; font-weight:800; font-size:12px; border:2px solid #fff; border-radius:10px; padding:7px 11px; cursor:pointer; background:linear-gradient(180deg,#ffe07a,var(--gold-deep)); color:#4a3000; }
+  .v-btn.in-call { background:#ffe0dc; color:#b3261e; border-color:#f19b93; }
+  .v-btn.sub { background:#fff; color:var(--gold-dark); border:2px solid var(--hair); }
+  .v-btn.muted { background:#ffe0dc; color:#b3261e; border-color:#f19b93; }
+  .voice-hint { font-size:11.5px; color:var(--muted); margin:8px 0 0; line-height:1.5; font-weight:500; }
+  .v-list { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .v-chip { display:flex; align-items:center; gap:6px; background:#fff; border:2px solid var(--hair); border-radius:999px; padding:4px 10px 4px 5px; font-size:12px; font-weight:700; }
+  .v-av { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; background:var(--butter); border:2px solid transparent; flex:none; transition:.15s; }
+  .v-chip.speaking .v-av { border-color:#2fbf5b; box-shadow:0 0 8px rgba(47,191,91,.7); }
+  .v-chip.self-muted .v-av { opacity:.6; border-color:#f19b93; }
   #toast { position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(30px); background:#5b3d00; color:#fff; border:2px solid #fff; padding:10px 16px; border-radius:12px; font-size:13px; font-weight:700; opacity:0; transition:.25s; z-index:50; max-width:90vw; text-align:center; pointer-events:none; }
   #toast.show { opacity:1; transform:translateX(-50%); }
   #fatal { display:none; background:#fff; border:2px solid #e0a000; color:#7a2d00; border-radius:14px; padding:14px; font-size:13.5px; line-height:1.55; margin-bottom:14px; }
@@ -338,6 +356,14 @@
       <button class="btn ghost" id="copyCode" style="margin-top:0">📋 Copy registration link</button>
       <div class="count" id="playerCount">0 players</div>
       <div class="chips" id="playerList"></div>
+      <div class="voice-panel">
+        <div class="voice-head">
+          <span class="voice-title"><span class="v-dot"></span>🔊 VOICE CHAT</span>
+          <span class="voice-btns"><button class="v-btn v-join" type="button">🎙️ Join Voice</button></span>
+        </div>
+        <p class="voice-hint">Usap-usap live kasama ang lahat sa room — optional, kailangan ng mic access.</p>
+        <div class="v-list"></div>
+      </div>
       <button class="btn ghost" id="addCardsLobby">🎟️ Add a card</button>
       <p class="note" id="waitNote"></p>
       <button class="btn" id="startBtn" hidden>Start Calling Numbers</button>
@@ -375,6 +401,19 @@
 
       <div class="sec-title">🧑‍🤝‍🧑 PLAYERS</div>
       <div class="chips" id="statusList"></div>
+
+      <div class="voice-panel">
+        <div class="voice-head">
+          <span class="voice-title"><span class="v-dot"></span>🔊 VOICE CHAT</span>
+          <span class="voice-btns">
+            <button class="v-btn v-join" type="button">🎙️ Join Voice</button>
+            <button class="v-btn sub v-mute" type="button" hidden>🎙️ Mute</button>
+            <button class="v-btn sub v-speaker" type="button" hidden>🔊 Force Speaker</button>
+          </span>
+        </div>
+        <p class="voice-hint">Usap-usap live kasama ang lahat sa room — optional, kailangan ng mic access.</p>
+        <div class="v-list"></div>
+      </div>
 
       <div class="sec-title">💬 ROOM CHAT</div>
       <div class="chat-box" id="chatBox"></div>
@@ -938,6 +977,7 @@ let chatMsgs = [], typingMap = {}, lastReassign = 0;
 let manualMarks = new Set(), marksKey = null, lastDrawnLen = -1, lastCardsSig = '';
 
 function stopWatching() {
+  try { leaveVoice(); } catch (e) { /* voice not ready yet */ }
   [roomChan, chatChan, typingChan].forEach((c) => { if (c) sb.removeChannel(c); });
   roomChan = chatChan = typingChan = null;
   if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
@@ -1292,6 +1332,197 @@ $('chatInput').addEventListener('input', () => {
   const now = Date.now(); if (now - lastTypePing < 1500) return; lastTypePing = now;
   typingChan.send({ type: 'broadcast', event: 'typing', payload: { id: myId, name: getSession().name || 'Someone' } });
 });
+
+/* ---------- voice chat (WebRTC mesh, signaled over Supabase realtime) ---------- */
+const VOICE_OK = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.RTCPeerConnection);
+if (!VOICE_OK) document.querySelectorAll('.voice-panel').forEach((p) => { p.hidden = true; });
+const ICE_CFG = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] };
+let voiceChan = null, voiceCode = null, voiceJoined = false, voiceMuted = false, voiceSid = '';
+let localStream = null, voicePeers = {}, voiceMembers = {}, remoteEls = {};
+let audioCtx = null, analysers = {}, speakingRAF = null;
+
+function audioHint() { try { if ('audioSession' in navigator) navigator.audioSession.type = 'play-and-record'; } catch (e) {} }
+
+function watchSpeaking(key, stream) {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!audioCtx && AC) audioCtx = new AC();
+    if (!audioCtx || !stream) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+    const an = audioCtx.createAnalyser(); an.fftSize = 512;
+    audioCtx.createMediaStreamSource(stream).connect(an);
+    analysers[key] = { an, data: new Uint8Array(an.frequencyBinCount) };
+    if (!speakingRAF) speakingTick();
+  } catch (e) { /* ignore */ }
+}
+function speakingTick() {
+  speakingRAF = requestAnimationFrame(speakingTick);
+  const keys = Object.keys(analysers);
+  if (!keys.length) return;
+  const on = {};
+  keys.forEach((k) => {
+    const a = analysers[k]; a.an.getByteFrequencyData(a.data);
+    let sum = 0; for (let i = 0; i < a.data.length; i++) sum += a.data[i];
+    on[k] = sum / a.data.length > 14;
+  });
+  document.querySelectorAll('.v-chip').forEach((c) => c.classList.toggle('speaking', !!on[c.dataset.peer]));
+}
+
+function sendSig(to, msg) {
+  if (!voiceChan) return;
+  voiceChan.send({ type: 'broadcast', event: 'sig', payload: Object.assign({ to, from: myId }, msg) }).catch(() => {});
+}
+
+function createPeer(pid, isCaller) {
+  const pc = new RTCPeerConnection(ICE_CFG);
+  const entry = { pc, pending: [], isCaller, sid: (voiceMembers[pid] || {}).sid };
+  voicePeers[pid] = entry;
+  if (localStream) localStream.getTracks().forEach((t) => pc.addTrack(t, localStream));
+  pc.onicecandidate = (e) => { if (e.candidate) sendSig(pid, { kind: 'cand', cand: e.candidate.toJSON() }); };
+  pc.ontrack = (e) => {
+    let el = remoteEls[pid];
+    if (!el) {
+      // <video> (audio-only stream) so iPhones route to the loudspeaker instead of the earpiece
+      el = document.createElement('video');
+      el.autoplay = true; el.muted = false; el.volume = 1;
+      el.setAttribute('playsinline', ''); el.setAttribute('webkit-playsinline', '');
+      el.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;';
+      document.body.appendChild(el); remoteEls[pid] = el;
+    }
+    el.srcObject = e.streams[0]; el.play().catch(() => {});
+    watchSpeaking(pid, e.streams[0]);
+  };
+  pc.onconnectionstatechange = () => {
+    if (pc.connectionState === 'failed' && voicePeers[pid] === entry) {
+      teardownPeer(pid);
+      setTimeout(() => { if (voiceJoined && voiceMembers[pid] && !voicePeers[pid]) createPeer(pid, myId < pid); }, 1000);
+    }
+  };
+  if (isCaller) {
+    pc.createOffer().then((o) => pc.setLocalDescription(o))
+      .then(() => sendSig(pid, { kind: 'offer', sdp: pc.localDescription.sdp, type: pc.localDescription.type }))
+      .catch(() => {});
+  }
+  return entry;
+}
+function teardownPeer(pid) {
+  const e = voicePeers[pid]; if (!e) return;
+  try { e.pc.close(); } catch (x) {}
+  delete voicePeers[pid]; delete analysers[pid];
+  const el = remoteEls[pid]; if (el) { el.srcObject = null; el.remove(); delete remoteEls[pid]; }
+}
+async function flushPending(entry) {
+  const list = entry.pending.splice(0);
+  for (const c of list) { try { await entry.pc.addIceCandidate(new RTCIceCandidate(c)); } catch (e) {} }
+}
+async function onSignal(p) {
+  if (!voiceJoined || !p || p.to !== myId) return;
+  const pid = p.from;
+  try {
+    if (p.kind === 'offer') {
+      let entry = voicePeers[pid];
+      if (entry && entry.pc.remoteDescription) { teardownPeer(pid); entry = null; }
+      if (!entry) entry = createPeer(pid, false);
+      await entry.pc.setRemoteDescription(new RTCSessionDescription({ type: p.type, sdp: p.sdp }));
+      await flushPending(entry);
+      const ans = await entry.pc.createAnswer();
+      await entry.pc.setLocalDescription(ans);
+      sendSig(pid, { kind: 'answer', sdp: entry.pc.localDescription.sdp, type: entry.pc.localDescription.type });
+    } else if (p.kind === 'answer') {
+      const entry = voicePeers[pid];
+      if (entry && entry.pc.signalingState === 'have-local-offer') {
+        await entry.pc.setRemoteDescription(new RTCSessionDescription({ type: p.type, sdp: p.sdp }));
+        await flushPending(entry);
+      }
+    } else if (p.kind === 'cand') {
+      const entry = voicePeers[pid]; if (!entry) return;
+      if (entry.pc.remoteDescription) entry.pc.addIceCandidate(new RTCIceCandidate(p.cand)).catch(() => {});
+      else entry.pending.push(p.cand);
+    }
+  } catch (e) { /* ignore bad signal */ }
+}
+
+function onVoiceSync() {
+  if (!voiceChan) return;
+  const st = voiceChan.presenceState(); const m = {};
+  Object.keys(st).forEach((id) => { if (st[id] && st[id][0]) m[id] = st[id][0]; });
+  voiceMembers = m;
+  const present = Object.keys(m).filter((id) => id !== myId);
+  present.forEach((pid) => {
+    const e = voicePeers[pid];
+    if (e && e.sid && m[pid].sid && e.sid !== m[pid].sid) teardownPeer(pid); // they rejoined
+    if (!voicePeers[pid]) createPeer(pid, myId < pid);
+  });
+  Object.keys(voicePeers).forEach((pid) => { if (present.indexOf(pid) === -1) teardownPeer(pid); });
+  renderVoiceUI();
+}
+
+async function joinVoice() {
+  if (voiceJoined || !curCode) return;
+  if (!VOICE_OK) { toast('❌ Hindi supported ang voice chat sa browser/device na ito.'); return; }
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, video: false });
+  } catch (e) { toast('❌ Walang mic access. I-allow ang mic sa browser.'); return; }
+  audioHint();
+  voiceJoined = true; voiceCode = curCode; voiceMuted = false;
+  voiceSid = Math.random().toString(36).slice(2, 10);
+  watchSpeaking('__self', localStream);
+  const name = getSession().name || 'Player';
+  const ch = sb.channel('bng-voice-' + voiceCode, { config: { broadcast: { self: false }, presence: { key: myId } } });
+  voiceChan = ch;
+  ch.on('presence', { event: 'sync' }, onVoiceSync)
+    .on('broadcast', { event: 'sig' }, ({ payload }) => onSignal(payload))
+    .subscribe(async (status) => {
+      if (voiceChan !== ch) return;
+      if (status === 'SUBSCRIBED') { await ch.track({ name, muted: false, sid: voiceSid }); }
+      else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') { toast('❌ Hindi maka-connect sa voice. Subukan ulit.'); leaveVoice(); }
+    });
+  renderVoiceUI();
+}
+
+function leaveVoice() {
+  if (!voiceJoined) return;
+  Object.keys(voicePeers).forEach(teardownPeer);
+  if (localStream) localStream.getTracks().forEach((t) => t.stop());
+  localStream = null; delete analysers['__self'];
+  const ch = voiceChan; voiceChan = null;
+  if (ch) { try { ch.untrack(); } catch (e) {} try { sb.removeChannel(ch); } catch (e) {} }
+  voiceJoined = false; voiceMuted = false; voiceCode = null; voiceMembers = {};
+  renderVoiceUI();
+}
+
+function toggleMute() {
+  if (!voiceJoined || !localStream) return;
+  voiceMuted = !voiceMuted;
+  localStream.getAudioTracks().forEach((t) => { t.enabled = !voiceMuted; });
+  if (voiceChan) voiceChan.track({ name: getSession().name || 'Player', muted: voiceMuted, sid: voiceSid }).catch(() => {});
+  renderVoiceUI();
+}
+
+function forceSpeaker() {
+  audioHint();
+  let any = false;
+  Object.values(remoteEls).forEach((el) => { any = true; el.play().catch(() => {}); });
+  if ('audioSession' in navigator) toast(any ? '🔊 Ibinalik ang audio sa speaker' : '🔊 Speaker hint applied — mag-join muna sa voice');
+  else toast('⚠️ Hindi supported ng browser na ito ang auto speaker switch — subukan ang Control Center o ang mute switch.');
+}
+
+function renderVoiceUI() {
+  const entries = Object.entries(voiceMembers);
+  const html = entries.length
+    ? entries.map(([id, v]) => '<span class="v-chip' + (v.muted ? ' self-muted' : '') + '" data-peer="' + (id === myId ? '__self' : esc(id)) + '">' +
+        '<span class="v-av">🎧</span>' + esc(v.name || 'Player') + '<span style="font-size:11px">' + (v.muted ? '🔇' : '🎙️') + '</span></span>').join('')
+    : '<span class="voice-hint" style="margin:0">Wala pang naka-voice.</span>';
+  document.querySelectorAll('.v-list').forEach((el) => { el.innerHTML = html; });
+  document.querySelectorAll('.v-join').forEach((b) => { b.textContent = voiceJoined ? '🔴 Leave Voice' : '🎙️ Join Voice'; b.classList.toggle('in-call', voiceJoined); });
+  document.querySelectorAll('.v-mute').forEach((b) => { b.hidden = !voiceJoined; b.textContent = voiceMuted ? '🔇 Unmute' : '🎙️ Mute'; b.classList.toggle('muted', voiceMuted); });
+  document.querySelectorAll('.v-speaker').forEach((b) => { b.hidden = !voiceJoined; });
+  document.querySelectorAll('.v-dot').forEach((d) => d.classList.toggle('on', voiceJoined));
+}
+document.querySelectorAll('.v-join').forEach((b) => { b.onclick = () => { if (voiceJoined) leaveVoice(); else joinVoice(); }; });
+document.querySelectorAll('.v-mute').forEach((b) => { b.onclick = toggleMute; });
+document.querySelectorAll('.v-speaker').forEach((b) => { b.onclick = forceSpeaker; });
+renderVoiceUI();
 
 /* ---------- leave ---------- */
 async function leaveRoom() {
