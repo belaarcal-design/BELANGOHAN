@@ -288,7 +288,7 @@
     <div id="viewWait" hidden>
       <div class="final"><h2 id="waitTitle">Loading…</h2><p id="waitMsg"></p></div>
       <div id="waitConfirmWrap" hidden style="margin-top:14px">
-        <button class="btn" id="waitConfirmBtn" type="button">✅ Yes, I am using this link now</button>
+        <button class="btn" id="waitConfirmBtn" type="button">🎟️ Use my card &amp; join the room</button>
         <p class="note" style="text-align:center">It can only be used once. When you confirm, it locks to this device.</p>
       </div>
       <div id="waitUploadWrap" hidden class="field" style="margin-top:14px">
@@ -779,8 +779,14 @@ async function gateCheck() {
   }
   $('waitUploadWrap').hidden = true;
   if (ls === 'unclaimed') {
-    canPlay = false; $('waitConfirmWrap').hidden = false;
-    return setWait(hi, '✅ You are ready! This link can only be used once — press the button below when you are ready to use it.');
+    // the player decides when to use their card; once a room is live, one tap takes them straight in (no code)
+    canPlay = false;
+    if (!lastLiveCode) {
+      $('waitConfirmWrap').hidden = true;
+      return setWait(hi, '✅ You are all set! The host has not opened the room yet — this page will tell you when it is open.');
+    }
+    $('waitConfirmWrap').hidden = false;
+    return setWait(hi, '🟢 The room is open! Tap the button below when you want to use your card — you will go straight in.');
   }
   $('waitConfirmWrap').hidden = true;
   if (!canPlay) { canPlay = true; setWait(hi, '⏳ Waiting for the host to open the game — you will be taken in automatically once it is live.'); handleLive(lastLiveCode); }
