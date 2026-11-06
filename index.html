@@ -703,11 +703,12 @@ async function joinRoom(code, name, cardCount) {
 }
 
 /* ---------- PLAYER MODE: unique link -> whatever room is live ---------- */
-let regData = null, joining = false, manualLeft = false, lastLiveCode = null, canPlay = false;
+let regData = null, joining = false, manualLeft = false, lastLiveCode = null, canPlay = false, endedCode = null;
 function setWait(title, msg) { $('waitTitle').textContent = title; $('waitMsg').textContent = msg; }
 async function handleLive(code) {
   lastLiveCode = code || null;
   if (!regData || joining || manualLeft || !canPlay) return;
+  if (!code) endedCode = null;
   if (!code) { if (!curCode) setWait('Hi, ' + regData.name + '! 👋', '⏳ Waiting for the host to open the game — this page will take you in automatically.'); return; }
   if (curCode === code) return;
   joining = true;
@@ -745,6 +746,7 @@ async function gateCheck() {
   }
   $('waitConfirmWrap').hidden = true;
   if (!canPlay) { canPlay = true; setWait(hi, '⏳ Waiting for the host to open the game — you will be taken in automatically once it is live.'); handleLive(lastLiveCode); }
+  else if (!joining && lastLiveCode && lastLiveCode !== endedCode) handleLive(lastLiveCode); // retry: a failed/early join used to leave players stuck on the waiting screen
 }
 $('waitConfirmBtn').onclick = async () => {
   const btn = $('waitConfirmBtn'); btn.disabled = true;
@@ -1038,6 +1040,7 @@ function handleRoom(code, data, rev) {
     const s = getSession(); setSession(null, s.name);
     stopWatching(); curCode = null; showView(homeView);
     if (HOST_MODE) { hostAutoSkip = true; hostPanelOpen = false; $('backToRoom').hidden = true; $('enterLiveBtn').hidden = !hostLiveCode; }
+    if (PLAYER_TOKEN) endedCode = code;
     if (PLAYER_TOKEN) setWait('Hi, ' + (regData ? regData.name : '') + '! 👋', '⏳ That game ended. Waiting for the host to open the next one…');
     else toast('That room was closed.');
     return;
