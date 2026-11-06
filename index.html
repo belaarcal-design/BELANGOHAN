@@ -444,8 +444,8 @@
       <div class="live-cell"><b id="liveC">0</b><span>cards</span></div>
     </div>
     <div id="liveMoney" hidden class="note" style="text-align:center;font-weight:800"></div>
-    <div class="sec-title">🏆 LEADERBOARD</div>
-    <div id="lbList"><p class="note" style="margin:0">No winners yet. Will you be the first?</p></div>
+    <div class="sec-title">🏆 LEADERBOARD — MOST CARDS BOUGHT</div>
+    <div id="lbList"><p class="note" style="margin:0">No cards bought yet. Be the first!</p></div>
   </div>
 </div>
 <div id="winOverlay" hidden>
@@ -1098,6 +1098,7 @@ function handleRoom(code, data, rev) {
 }
 
 function reassignHostIfGone(code, data) {
+  return; // host-only: nobody else is ever promoted to host (only the host can start / call / start next round)
   const host = (data.players || {})[data.hostId];
   if (host && !host.left) return;
   if (Date.now() - lastReassign < 5000) return;
@@ -1623,9 +1624,10 @@ async function refreshLive() {
   } catch (e) { /* stats not set up yet */ }
   try {
     const lb = await rpc('bingo_leaderboard');
+    if (Array.isArray(lb) && !lb.length) $('lbList').innerHTML = '<p class="note" style="margin:0">No cards bought yet. Be the first!</p>';
     if (Array.isArray(lb) && lb.length) {
       const medal = ['🥇', '🥈', '🥉'];
-      $('lbList').innerHTML = lb.map((r, i) => '<div class="lb-row' + (i === 0 ? ' top' : '') + '"><span class="rk">' + (medal[i] || (i + 1)) + '</span><span class="nm">' + esc(r.name || 'Player') + '</span><span class="ws">' + r.wins + (r.wins === 1 ? ' win' : ' wins') + '</span></div>').join('');
+      $('lbList').innerHTML = lb.map((r, i) => '<div class="lb-row' + (i === 0 ? ' top' : '') + '"><span class="rk">' + (medal[i] || (i + 1)) + '</span><span class="nm">' + esc(r.name || 'Player') + '</span><span class="ws">' + r.cards + '🎟️ ' + (r.cards === 1 ? 'card' : 'cards') + '</span></div>').join('');
     }
   } catch (e) { /* leaderboard not set up yet */ }
 }
