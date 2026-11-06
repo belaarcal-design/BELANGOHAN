@@ -297,6 +297,11 @@
         <button class="btn ghost" id="waitUploadBtn" type="button">Send receipt</button>
       </div>
       <button class="btn" id="waitRejoin" hidden>🔁 Rejoin the game</button>
+      <div id="waitRoster" hidden style="margin-top:16px">
+        <div class="sec-title" style="margin-top:0">👥 IN THE ROOM NOW</div>
+        <div class="count" id="waitRosterCount">0 players</div>
+        <div class="chips" id="waitRosterList"></div>
+      </div>
     </div>
 
     <!-- HOST PANEL (?host) -->
@@ -316,6 +321,10 @@
         </div>
         <button class="btn" id="createBtn">➕ Open a new room &amp; set it live</button>
         <p class="note" id="liveStatus">No live room right now.</p>
+        <div id="hostRosterBox" hidden>
+          <div class="count" id="hostRosterCount">0 players</div>
+          <div class="chips" id="hostRoster"></div>
+        </div>
         <button class="btn" id="enterLiveBtn" style="margin-bottom:10px" hidden>🚪 Enter live room</button>
         <button class="btn ghost" id="closeLiveBtn" style="margin-top:0" hidden>⏹ Stop letting players in</button>
         <div class="sec-title" style="margin-top:6px">💳 PAYMENT DETAILS</div>
@@ -691,6 +700,35 @@ function watchLive(cb) {
   setInterval(fetchNow, 4000); // safety net in case realtime is off
 }
 
+/* ---------- who is in the room (readable by anyone) ---------- */
+async function fetchRoster(code) {
+  if (!code) return null;
+  const { data, error } = await sb.from('bingo_rooms').select('data').eq('code', code).maybeSingle();
+  if (error || !data || !data.data) return null;
+  const d = data.data;
+  return Object.entries(d.players || {}).filter(([, p]) => p && !p.left)
+    .map(([id, p]) => ({ name: p.name || 'Player', cards: playerCards(p).length, host: id === d.hostId }));
+}
+function paintRoster(listEl, countEl, list) {
+  countEl.textContent = list.length + (list.length === 1 ? ' player' : ' players');
+  listEl.innerHTML = list.map((p) => '<span class="chip">' + esc(p.name) + ' · ' + p.cards + '🎟️' +
+    (p.host ? '<span class="host-tag">HOST</span>' : '') + '</span>').join('');
+}
+async function refreshWaitRoster() {
+  const box = $('waitRoster');
+  if (curCode || !canPlay || !lastLiveCode) { box.hidden = true; return; }
+  const list = await fetchRoster(lastLiveCode);
+  if (!list || curCode) { box.hidden = true; return; }
+  paintRoster($('waitRosterList'), $('waitRosterCount'), list); box.hidden = false;
+}
+async function refreshHostRoster() {
+  const box = $('hostRosterBox');
+  if (!hostLiveCode) { box.hidden = true; return; }
+  const list = await fetchRoster(hostLiveCode);
+  if (!list) { box.hidden = true; return; }
+  paintRoster($('hostRoster'), $('hostRosterCount'), list); box.hidden = false;
+}
+
 /* ---------- join a room (player link) ---------- */
 async function joinRoom(code, name, cardCount) {
   const res = await rpc('bingo_join', { p_code: code, p_pid: myId, p_name: name, p_cards: cardCount });
@@ -776,6 +814,7 @@ async function startPlayerMode() {
     watchLive((c) => handleLive(c));
     gateCheck();
     setInterval(gateCheck, 5000);
+    setInterval(refreshWaitRoster, 4000);
   } catch (e) { console.error(e); setWait('⚠️ Connection problem', errMsg(e)); }
 }
 
@@ -870,12 +909,14 @@ $('hostUnlock').onclick = async () => {
     hostWatching = true;
     refreshRegList(); setInterval(refreshRegList, 5000);
     refreshReceipts(); setInterval(refreshReceipts, 5000);
+    setInterval(refreshHostRoster, 4000);
     loadSettings().then(() => { $('reqToggle').checked = requireReceipt; $('evAt').value = eventAt; $('evNote').value = eventNote; $('payPrice').value = cardPrice === '0' ? '' : cardPrice; $('payNoteIn').value = payNote; refreshQrState(); });
     watchLive((code) => {
       if (code !== hostLiveCode) hostAutoSkip = false;
       hostLiveCode = code || null;
       $('liveStatus').textContent = code ? '🟢 Live room: ' + code + ' — only one room at a time. Stop it first to open a new one.' : 'No live room right now.';
       $('closeLiveBtn').hidden = !code;
+      refreshHostRoster();
       $('enterLiveBtn').hidden = !code || !!curCode;
       $('createBtn').disabled = !!code;
       $('createBtn').textContent = code ? '🔒 A room is already live' : '➕ Open a new room & set it live';
